@@ -1,0 +1,46 @@
+{% extends "shop/base.html" %}
+{% load static %}
+{% block content %}
+
+<h2 class="h2">{% block title %}{{ post.title }}
+  {% with comments.count as total_comments %}  
+   ({{ total_comments }})
+ {% endwith %}
+  {% endblock %}
+</h2>
+
+
+<div class="feedback_wrapper">
+
+{% for comment in comments %}  
+  <div class="feedback_item">  
+    <div class="info">  
+        <span class="feedb_name">{{ forloop.counter }}. {{ comment.name }} </span> 
+        <span class="feedb_date">{{ comment.created }}</span>
+    </div>  
+    <div class="feedb_message">{{ comment.body|linebreaks }}</div>
+  </div>  
+{% empty %}  
+  <p>Відгуків немає.</p>  
+{% endfor %}
+
+ 
+
+<div class="feedb_form">
+  {% if new_comment %}  
+  <span class="feb_succces">Відгук додано.</span>  
+  {% else %} 
+        <h2 class="h3">Додати відгук</h2>  
+        <form action="." method="post">  
+            {{ comment_form.as_p }}  
+            {% csrf_token %}  
+            <p><input class="button" type="submit" value="Додати відгук"></p>  
+        </form>
+    {% endif %}
+</div>
+
+
+</div>
+
+
+{% endblock %}

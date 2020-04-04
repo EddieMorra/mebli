@@ -1,0 +1,24 @@
+{% extends "shop/base.html" %}
+{% load static %}
+
+{% block title %}
+  Дякуємо за замовлення
+{% endblock %}
+
+{% block content %}
+<div class="thx_page">
+  <img src="{% static 'img/iconfinder_Tick_Mark_Dark_1398912.svg' %}" alt="">
+  <h2 class="h2">Дякуємо за замовлення</h2>
+  <p>Вам зателефонують найближчим часом</p>
+  <p>Ідентифікатор вашого замовлення: {{ order.id }}</p>
+  <a class="button" href="/">Повернутись в магазин</a>
+  <audio autoplay>
+    <source src="{% static 'audio/prikol-sms-z_uk.mp3' %}" type="audio/mpeg">
+  </audio>
+</div>
+
+
+
+{% endblock %}
+
+

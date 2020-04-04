@@ -1,0 +1,85 @@
+{% extends 'shop/base.html' %}
+{% load static %}
+{% load thumbnail %}
+{% block content %}
+{% load mptt_tags %}
+{% load mathfilters %}
+
+
+{% if category.children.all %}
+<div class="cat_group_list">
+	<h3 class="h3">Підкатегорії</h3>
+	<div class="cat_group">
+		{% for z in category.children.all %}
+		<a href="{{ z.get_absolute_url }}" class="cat_group-item">
+			<span>
+				{% thumbnail z.image "400x230" crop="center" as im %}
+					<img src="{{ im.url }}" width="{{ im.width }}" height="{{ im.height }}">
+				{% endthumbnail %}
+			</span>
+			<p>{{ z.name }}</p>
+		</a>
+		{% endfor %}
+	</div>
+</div>
+{% else %}
+
+{% endif %}
+
+<h2 class="h2">{% block title %}{% if category %}{{ category.name }}{% else %}Товари{% endif %}{% endblock %}</h2>
+
+<div class="listpage infinite-container">
+	{% for product in products %}
+		<div class="cardd infinite-item">
+			<a href="{{ product.get_absolute_url }}">
+				{% thumbnail product.image "400x300" crop="center" as im %}
+					<img class="card-img-top" src="{{ im.url }}" width="{{ im.width }}" height="{{ im.height }}">
+				{% endthumbnail %}
+			</a>
+			<div class="cardd-body">
+				<h3 class="cardd-title">
+					<a href="{{ product.get_absolute_url }}">{{ product.name }}</a>
+				</h3>
+				<div class="cardd-text">
+					{% autoescape off %}
+						{{ product.description | truncatechars:150 }}
+					{% endautoescape %}
+				</div>
+				<div class="price_wrapper">
+					<p class="price_usd">{{ product.price }}</p>
+					<p class="price_uah">{{ product.price|mul:dollar.num | floatformat:"0" }}</p>
+				</div>
+			</div>
+		</div>
+		
+	{% endfor %}
+	
+</div>
+<div class="empty_text">Немає товарів</div>
+
+  <div class="loading" style="display: none;">
+    Завантаження...
+  </div>
+
+  {% if products.has_next  %}
+    <a class="infinite-more-link" href="?page={{ products.next_page_number }}">Більше</a>
+  {% endif %}
+
+  {% block javascript %}
+  <script>
+	var infinite = new Waypoint.Infinite({
+	  element: $('.infinite-container')[0],
+	  onBeforePageLoad: function () {
+		$('.loading').show();
+		
+	  },
+	  onAfterPageLoad: function ($items) {
+		$('.loading').hide();
+	  }
+	  
+	});
+  </script>
+
+  {% endblock %}
+
+{% endblock %}

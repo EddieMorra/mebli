@@ -1,0 +1,75 @@
+{% extends 'shop/base.html' %}
+{% load static %}
+{% load thumbnail %}
+{% load mathfilters %}
+
+
+{% block content %}
+
+<h2 class="h2">{% block title %}Результати пошуку:{% endblock %}</h2>
+
+<div class="row listpage infinite-container">
+
+	{% if products %}
+		{% for product in products %}
+		
+			<div class="cardd infinite-item">
+				<a href="{{ product.get_absolute_url }}">
+					{% thumbnail product.image "400x300" crop="center" as im %}
+						<img class="card-img-top" src="{{ im.url }}" width="{{ im.width }}" height="{{ im.height }}">
+					{% endthumbnail %}
+				</a>
+				<div class="cardd-body">
+					<h3 class="cardd-title">
+						<a href="{{ product.get_absolute_url }}">{{ product.name }}</a>
+					</h3>
+				
+					<div class="cardd-text">
+					{% autoescape off %}
+						{{ product.description | truncatechars:150 }}
+					{% endautoescape %}
+						<div class="price_wrapper">
+							<p class="price_usd">{{ product.price }}</p>
+							<p class="price_uah">{{ product.price|mul:dollar.num | floatformat:"0" }}</p>
+						</div>
+					</div>
+				</div>
+			</div>
+		{% endfor %}
+
+	{% else %}
+	<div class="container">
+		<p>Немає товарів за запитом</p>
+	</div>
+	{% endif %}
+
+</div>
+
+  <div class="loading" style="display: none;">
+    Loading...
+  </div>
+
+  {% if products.has_next  %}
+    <a class="infinite-more-link" href="?page={{ products.next_page_number }}">More</a>
+  {% endif %}
+
+  {% block javascript %}
+  <script>
+	var infinite = new Waypoint.Infinite({
+	  element: $('.infinite-container')[0],
+	  onBeforePageLoad: function () {
+		$('.loading').show();
+			$( ".price_wrapper" ).each(function() {
+				i = $(this).find('.price').html();
+				sum = i * 30.0
+				$(this).find('.price_uah').html(sum.toFixed(0));
+			});
+	  },
+	  onAfterPageLoad: function ($items) {
+		$('.loading').hide();
+	  }
+	});
+  </script>
+  {% endblock %}
+
+{% endblock %}

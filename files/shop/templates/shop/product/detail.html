@@ -1,0 +1,107 @@
+{% extends "shop/base.html" %}
+{% load static %}
+{% load embed_video_tags %}
+{% load thumbnail %}
+{% load mathfilters %}
+
+{% block content %}
+
+	<div class="container">
+
+		<div class="bdr">{{ product.category }}</div>
+
+		<div class="row bgw">
+			<div class="col-sm-12 sliderpic">
+				<h2 class="h2">{% block title %}{{ product.name }}{% endblock %}</h2>
+				<div class="slider_for slick-slider">
+					<div>
+						<img src="{% if product.image %}{{ product.image.url }}{% else %}{% static 'img/no-image.jpg'%}{% endif %}">
+					</div>
+					{% for image in product.images.all %}
+						<div>
+							{% if image.image %}
+								<img src="{{ image.image.url }}" alt="">
+							{% endif %}
+						</div>
+					{% endfor %}
+				</div>
+				<div class="slider_nav slick-slider">
+					<div>
+						{% thumbnail product.image "250x120" crop="center" as im %}
+							{% if product.image %}<img src="{{ im.url }}" width="{{ im.width }}" height="{{ im.height }}">{% else %}{% static 'img/no-image.jpg'%}{% endif %}
+						{% endthumbnail %}
+					</div>
+					{% for image in product.images.all %}
+						
+							{% if image.image %}
+							<div>
+								{% thumbnail image.image "250x120" crop="center" as im %}
+									<img src="{{ im.url }}" width="{{ im.width }}" height="{{ im.height }}">
+								{% endthumbnail %}
+							</div>
+							{% else %}
+								{% static 'img/no-image.jpg'%}
+							{% endif %}
+					{% endfor %}
+				</div>
+			</div>
+
+			
+
+			<div class="col-sm-12 product_r_wrapper">
+
+
+				<div class="price_and_button">
+					<form action="{% url 'cart:CartAdd' product.id %}" method="post">
+						{{ cart_product_form }}
+						{% csrf_token %}
+						<!-- <label for="check2">
+							<input class="hidden" id="check2" type="checkbox">
+							<span>gbgbf</span>
+						</label> -->
+						<input class="add_to_cart button" type="submit" value="Добавити в корзину">
+					</form>
+					<div class="price_wrapper price_wrapper_detail">
+						<p class="price_usd">{{ product.price }}</p>
+						<p class="price_uah">{{ product.price|mul:dollar.num | floatformat:"0" }}</p>
+					</div>
+				</div>
+
+				{% if product.rozmir %}<p class="rozm">Розмір:{{ product.rozmir }}</p>{% endif %}
+				<div class="prod_description"> 
+					<h2 class="">Опис</h2>
+					{% autoescape off %}
+						{{ product.description | safe }}
+					{% endautoescape %}
+				</div>
+
+				<div class="video_table">
+					{% if product.table.all %}
+						<div class="rb_main">
+							<h2>Характеристики товару</h2>
+							<div class="rable_zn_wrapper">
+								{% for z in product.table.all %}
+									<div class="table_zn">
+										<span class="tb_l">{{ z.name }}</span>
+										<span class="tb_r">{{ z.znachenn }}</span>
+									</div>
+								{% endfor %}
+							</div>
+						</div>
+					{% endif %}
+					{% if product.video %}
+						<div class="video">
+						<h2>Відео про товар</h2>
+							<iframe src="{{ product.video }}" frameborder="0" allowfullscreen></iframe>
+						</div>
+					{% endif %}
+				</div>
+
+
+
+
+			</div>
+		</div>
+	</div>
+
+{% endblock %}

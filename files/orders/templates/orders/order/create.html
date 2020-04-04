@@ -1,0 +1,41 @@
+{% extends "shop/base.html" %}
+{% load mathfilters %}
+
+{% block content %}
+<h2 class="h2">{% block title %}Оформлення замовлення{% endblock %}</h2>
+
+<div class="row">
+  <div class="col-sm-8">
+    <h2>Заповніть форму</h2>
+    <form class="order-form" action="." method="post">
+      {{ form.as_p }}
+      {% csrf_token %}
+      <input class="button" type="submit" value="Відправити заявку">
+    </form>
+  </div>
+
+
+  <div class="order-info col-sm-4">
+    <h2 class="h2">Ваше замовлення</h2>
+    <div>
+      {% for item in cart %}
+
+        <ul>
+          <li><span>Товар:</span> {{ item.product.name }}</li>
+          <li><span>Кількість:</span> {{ item.quantity }}</li>
+          <li><span>Ціна:</span><span class="price_uah">{{ item.total_price|mul:dollar.num | floatformat:"0" }}</span></li>
+        </ul>
+      {% endfor %}
+      <ul>
+        <li>
+          <span>Разом:</span><span class="price_uah">{{ cart.get_total_price|mul:dollar.num | floatformat:"0" }}</span>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+
+
+
+{% endblock %} 

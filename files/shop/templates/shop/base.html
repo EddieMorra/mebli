@@ -1,0 +1,306 @@
+{% load static %}
+
+{% load mptt_tags %}
+{% load thumbnail %}
+{% load mathfilters %}
+
+
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>{% block title %}Головна{% endblock %} | Меблі Любарта</title>
+
+  <link rel="shortcut icon" href="{% static 'img/favicon.ico' %}" type="image/x-icon">
+
+	<!-- <link href="https://fonts.googleapis.com/css?family=Roboto:400,700,900&display=swap" rel="stylesheet"> -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  <!-- Styles -->
+  <link rel="stylesheet" href="{% static 'css/slick.css' %}">
+  <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+
+<div class="top_hedline">
+    <div class="container">
+      <div class="row">
+        <div class="top_wrapper">
+          <ul class="socials">
+            <li>
+              <a target="_blank" href="https://www.instagram.com/mebli_lubarta/">
+                <i class="fab fa-instagram"></i>
+              </a>
+            </li>
+            <li>
+              <a target="_blank" href="https://www.facebook.com/meblilubarta/">
+                <i class="fab fa-facebook-square"></i>
+              </a>
+            </li>
+          </ul>
+          <ul class="top_item_wr">
+			{% for p in posts %}
+				<li><a href="{{ p.get_absolute_url }}">{{ p.title}}</a></li>
+			{% endfor %}
+            <li><a href="/">Головна</a></li>
+            <li class="top_item"><a href="#about">Про нас</a></li>
+            <li class="top_item"><a href="#contacts">Контакти</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+</div>
+<div class="logo-section">
+	<div class="container">
+		<div class="row">
+
+			<div class="logo_wrapper">
+				<div class="logo">
+					<a class="navbar-brand" href="/"><img src="{% static 'img/meblilubarta_logo.svg' %}" alt=""></a>
+				</div>
+				<div class="numb">
+					<ul>
+						<li><a href="tel:0938442367">(093) 844 - 23 - 67</a></li>
+						<li><a href="tel:0958285752">(095) 828 - 57 - 52</a></li>
+						<li><a href="tel:0682939753">(068) 293 - 97 - 53</a></li>
+					</ul>
+				</div>
+			</div>		
+
+			<div class="right_wr">
+				<div class="search-box">
+					<form action="{% url 'shop:search_results' %}" method="GET">
+						<input type="text" placeholder="Пошук" class="input" name="q" aria-lebel="Search">
+						<button class="butn" type="submit">
+							<i class="fa fa-search" aria-hidden="true"></i>
+						</button>
+					</form>
+				 </div>
+				<div class="cart">	
+					{% with total_items=cart|length %}
+						{% if cart|length > 0 %}
+						<a class="cart_l" href="{% url 'cart:CartDetail' %}">
+							<img src="{% static 'img/cart.svg' %}" alt="">
+							<span class="badge" id='cart_count'>{{ total_items }}</span> 
+							<div class="tipcart">
+									<span>Корзина на суму:</span>
+								<div class="price_wrapper">
+									<p class="price_uah">{{ cart.get_total_price }}</p>
+								</div>
+							</div>
+						</a>
+						{% else %}
+							<img src="{% static 'img/cart.svg' %}" alt="">
+							<span class="badge" id='cart_count'>{{ total_items }}</span> 
+						{% endif %}
+					{% endwith %}
+					</a>
+				</div>
+			</div>
+
+		</div>
+	</div>
+</div>
+
+<div class="nav">
+	<div class="container">
+		<button class="mob_mtn">
+			<span class="nav_ico"></span>
+		</button>
+		
+		<ul class="navigation">
+			{% recursetree categories %}
+				<li>
+					<a href="{{ node.get_absolute_url }}">
+					{{ node.name }}
+					</a>
+					{% if not node.is_leaf_node %}
+						<ul class="children">
+							{{ children }}
+						</ul>
+					{% endif %}
+				</li>
+			{% endrecursetree %}
+		</ul>
+		
+		
+		<ul class="mob_menu">
+			{% recursetree categories %}
+				<li>
+					<a href="{{ node.get_absolute_url }}">
+						<p>{{ node.name }}</p>
+						<span>
+							{% thumbnail node.image "400x230" crop="center" as im %}
+								<img src="{{ im.url }}" width="{{ im.width }}" height="{{ im.height }}">
+							{% endthumbnail %}
+						</span>
+					</a>
+				</li>
+			{% endrecursetree %}
+			<button class="close_btn">
+				<i class="fa fa-times" aria-hidden="true"></i>
+			</button>
+		</ul>
+		
+	</div>
+</div>
+
+
+
+<div class="content">
+<div class="container">
+	{% block content %}
+	<div class="slider2sec_wrapper">
+		<div class="topleft_section">
+			<div class="first_slider">
+				{% for product in slider_main %}
+				<div>
+					<div class="first_slider_item">
+							<a href="{{ product.get_absolute_url }}">{{ product.name }}</a>
+						{% thumbnail product.image "540x400" crop="center" as im %}
+							<img src="{{ im.url }}" width="{{ im.width }}" height="{{ im.height }}">
+						{% endthumbnail %}
+						<p>{{ product.price_uah | floatformat:"0" }}</p>
+						<p class="spec">Спеціальна пропозиція</p>
+					</div>
+				</div>		
+				{% endfor %}
+			</div>
+		</div>
+		<div class="topright_section">
+			{% for product in categories_right_section %}
+			<a href="{{ product.get_absolute_url }}">
+				<div class="right_section_{{ forloop.counter }} r">
+					{% thumbnail product.image "600x300" crop="center" as im %}
+    					<img src="{{ im.url }}" width="{{ im.width }}" height="{{ im.height }}">
+					{% endthumbnail %}
+					<p>{{ product.name }}</p>
+				</div>
+			</a>
+			{% endfor %}
+		</div>
+	</div>
+
+	<div class="container new_prod">	
+			<h2 class="h2">Нові товари</h2>	
+		<div class="new_product_sl">	
+			{% for product in products %}
+				<div>
+					<div class="cardd">
+						<a href="{{ product.get_absolute_url }}">
+							{% thumbnail product.image "290x200" crop="center" as im %}
+								<img class="card-img-top" src="{{ im.url }}" width="{{ im.width }}" height="{{ im.height }}">
+							{% endthumbnail %}
+						</a>
+						<div class="cardd-body">
+						<h3 class="cardd-title">
+							<a href="{{ product.get_absolute_url }}">{{ product.name }}</a>
+						</h3>
+						
+						<div class="price_wrapper">
+							<p class="price_usd">{{ product.price }}</p>
+							<p class="price_uah">{{ product.price|mul:dollar.num | floatformat:"0" }}</p>
+						</div>
+						</div>
+						
+					</div>
+				</div>
+			{% endfor %}
+		</div>
+	</div>
+
+	<div class="container cat_wrapper">
+		<div class="row">
+			<div class="col-lg-12">
+				<h2 class="h2">Категорії</h2>
+				<div class="cat_group">
+				
+					{% recursetree categories %}
+						<a href="{{ node.get_absolute_url }}" class="cat_group-item">
+							<div>
+								<span>
+									{% thumbnail node.image "400x230" crop="center" as im %}
+										<img src="{{ im.url }}" width="{{ im.width }}" height="{{ im.height }}">
+									{% endthumbnail %}
+								</span>
+								<p>{{ node.name }}</p>
+							</div>
+								
+						</a>
+					{% endrecursetree %}
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- <div class="special">
+		<div class="container">
+			<h2>Спеціальні пропо</h2>
+			<div class="row">
+				<div class="col-sm-6"><img src="https://images.pexels.com/photos/1626481/pexels-photo-1626481.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500" alt=""></div>
+				<div class="col-sm-6">
+					<h3>Name</h3>
+
+				</div>
+			</div>
+		</div>
+	</div> -->
+	<div class="container" id="about">
+		<div class="text_block">
+			<div>
+				{% autoescape off %}
+					{{ main.abouttext | safe }}
+				{% endautoescape %}
+			</div>
+		</div>
+	</div>
+	<div class="contacts" id="contacts">
+		<div class="container">
+			<h2 class="h2">Наші контакти</h2>
+			<div class="rofw">
+				<div class="contacts_inner row">
+					<iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d647.1862371823197!2d25.373707681432816!3d50.77006545179314!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x472590b54c3c25f3%3A0xa21f8fa3498482a6!2z0YPQuy4g0JXRgNGI0L7QstCwLCAxMdCwLCDQm9GD0YbQuiwg0JLQvtC70YvQvdGB0LrQsNGPINC-0LHQu9Cw0YHRgtGMLCA0MzAwMA!5e1!3m2!1sru!2sua!4v1584384426084!5m2!1sru!2sua" frameborder="0" style="border:0;" allowfullscreen="" aria-hidden="false" tabindex="0"></iframe>
+					<div class="contacts_inner_right col-sm-12 col-md-4">
+						{% autoescape off %}
+							{{ main.contacts | safe }}
+						{% endautoescape %}
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	{% endblock %}
+	</div>
+</div>
+
+<div id="upbutton"><i class="fa fa-angle-double-up" aria-hidden="true"></i></div>
+
+<footer class="">
+	<div class="container">
+		<div class="foo_wrapper">
+			<div class="logo">
+				<a class="navbar-brand" href="/">
+					<img src="{% static 'img/meblilubarta_logo_white.svg' %}" alt="">
+				</a>
+			</div>
+		</div>
+		</div>
+	<p class="copyright">Copyright &copy; Меблі Любарта {% now “Y” %}</p>
+</footer>
+          
+ <!-- <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script> -->
+
+  <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ" crossorigin="anonymous"></script> 
+  <!-- <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script> -->
+  <script src="https://kit.fontawesome.com/91cadea843.js" crossorigin="anonymous"></script>
+  <script src="{% static 'js/slick.min.js' %}" type="text/javascript"></script>
+
+  <script src="{% static 'js/jquery.waypoints.min.js' %}" type="text/javascript"></script>
+  <script src="{% static 'js/infinite.min.js' %}" type="text/javascript"></script>
+  <script src="{% static 'js/script.js' %}" type="text/javascript"></script>
+  {% block javascript %}{% endblock %}
+</body>
+</html>
